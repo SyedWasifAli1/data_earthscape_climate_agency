@@ -1,0 +1,97 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Analyst Dashboard{% endblock %}
+{% block header %}Analyst Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- 🔹 Top Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-2xl shadow-lg">
+      <h2 class="text-lg font-semibold">Total Datasets</h2>
+      <p class="text-3xl font-bold mt-2">128</p>
+      <p class="text-sm opacity-80 mt-1">+8 this week</p>
+    </div>
+    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 rounded-2xl shadow-lg">
+      <h2 class="text-lg font-semibold">Active Analysts</h2>
+      <p class="text-3xl font-bold mt-2">32</p>
+      <p class="text-sm opacity-80 mt-1">↑ 5 new joined</p>
+    </div>
+    <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-2xl shadow-lg">
+      <h2 class="text-lg font-semibold">Real-Time Sources</h2>
+      <p class="text-3xl font-bold mt-2">56</p>
+      <p class="text-sm opacity-80 mt-1">Connected</p>
+    </div>
+  </div>
+
+  <!-- 🔹 Charts Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+
+    <!-- Line Chart -->
+    <div class="bg-white p-6 rounded-xl shadow-lg">
+      <h3 class="text-xl font-bold mb-4 text-gray-700">Monthly Data Uploads</h3>
+      <canvas id="uploadChart" height="200"></canvas>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="bg-white p-6 rounded-xl shadow-lg">
+      <h3 class="text-xl font-bold mb-4 text-gray-700">Dataset Source Types</h3>
+      <canvas id="sourceChart" height="200"></canvas>
+    </div>
+
+  </div>
+
+  <!-- 🔹 Bottom Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">
+      <h2 class="text-lg font-bold mb-2 text-blue-600">Data Analysis</h2>
+      <p class="text-gray-600">Explore, filter, and correlate climate datasets to detect trends and anomalies in real-time.</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-purple-500">
+      <h2 class="text-lg font-bold mb-2 text-purple-600">Visualizations</h2>
+      <p class="text-gray-600">Generate advanced charts and anomaly heatmaps using satellite and sensor data feeds.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // 🔸 Line Chart
+  const uploadCtx = document.getElementById('uploadChart');
+  new Chart(uploadCtx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+      datasets: [{
+        label: 'Uploads',
+        data: [12, 19, 8, 15, 22, 30, 25, 32],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59,130,246,0.2)',
+        fill: true,
+        tension: 0.4,
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+
+  // 🔸 Pie Chart
+  const sourceCtx = document.getElementById('sourceChart');
+  new Chart(sourceCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Satellite', 'Sensor', 'Weather Station', 'Historical Data'],
+      datasets: [{
+        label: 'Sources',
+        data: [45, 25, 20, 10],
+        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+        hoverOffset: 6
+      }]
+    },
+    options: { responsive: true }
+  });
+</script>
+{% endblock %}

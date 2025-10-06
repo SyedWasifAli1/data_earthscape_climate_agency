@@ -1,0 +1,130 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Satellite Data{% endblock %}
+{% block header %}Satellite Datasets{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- 🔹 Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <h2 class="text-2xl font-bold text-gray-800">🛰️ Satellite Data Explorer</h2>
+    <div class="flex gap-3">
+      <input id="searchInput" 
+             type="text" 
+             placeholder="Search Satellite..."
+             class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none w-64" />
+      <select id="filterSelect" 
+              class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+        <option value="all">All</option>
+        <option value="Active">Active Satellites</option>
+        <option value="Retired">Retired</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 🔹 Loader -->
+  <div id="loader" class="text-center py-10 hidden">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-400 border-t-transparent mx-auto"></div>
+    <p class="mt-3 text-gray-500">Loading local satellite data...</p>
+  </div>
+
+  <!-- 🔹 Container -->
+  <div id="satelliteContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
+
+</div>
+
+<script>
+  const container = document.getElementById('satelliteContainer');
+  const loader = document.getElementById('loader');
+  const searchInput = document.getElementById('searchInput');
+  const filterSelect = document.getElementById('filterSelect');
+  let allSatellites = [];
+
+  // 🚀 Fetch from local JSON
+  async function fetchSatellites() {
+    loader.classList.remove('hidden');
+    try {
+      const res = await fetch('/static/data/100_satellites.json');
+      const data = await res.json();
+      allSatellites = data;
+      renderSatellites(allSatellites);
+    } catch (err) {
+      container.innerHTML = `<p class="text-red-500 text-center">⚠️ Error loading demo data</p>`;
+    } finally {
+      loader.classList.add('hidden');
+    }
+  }
+
+ // 🔸 Render Modern Satellite Cards
+function renderSatellites(satellites) {
+  container.innerHTML = satellites
+    .map(
+      (sat, i) => `
+      <div class="relative overflow-hidden backdrop-blur-lg bg-white/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg transition-all transform hover:scale-[1.03] hover:shadow-2xl duration-300 p-6 group">
+        
+        <!-- Accent Border -->
+        <div class="absolute top-0 left-0 w-full h-1.5 ${
+          sat.type === 'Active'
+            ? 'bg-gradient-to-r from-green-400 to-emerald-500'
+            : sat.type === 'Planned'
+            ? 'bg-gradient-to-r from-blue-400 to-cyan-500'
+            : 'bg-gradient-to-r from-gray-400 to-gray-600'
+        }"></div>
+        
+        <!-- Card Content -->
+        <div class="mt-3">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors mb-2">
+            ${sat.name}
+          </h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm mb-1">
+            <span class="font-semibold text-gray-800 dark:text-gray-100">ID:</span> ${sat.id}
+          </p>
+          <p class="text-gray-600 dark:text-gray-300 text-sm mb-1">
+            <span class="font-semibold text-gray-800 dark:text-gray-100">Status:</span> 
+            <span class="${
+              sat.type === 'Active'
+                ? 'text-green-600 font-semibold'
+                : sat.type === 'Planned'
+                ? 'text-blue-600 font-semibold'
+                : 'text-gray-500 font-semibold'
+            }">${sat.type}</span>
+          </p>
+          <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
+            <span class="font-semibold text-gray-800 dark:text-gray-100">Launch:</span> ${sat.launch_date}
+          </p>
+        </div>
+        
+        <!-- Button -->
+        <div class="flex justify-end">
+          <a href="${sat.link}" target="_blank"
+            class="relative inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-2 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:from-indigo-500 hover:to-blue-500 transition-all duration-300 group-hover:translate-y-[-2px]">
+            🚀 More Info
+          </a>
+        </div>
+
+      </div>
+    `
+    )
+    .join('');
+}
+
+
+  // 🔍 Filters
+  function applyFilters() {
+    const query = searchInput.value.toLowerCase();
+    const filter = filterSelect.value;
+    const filtered = allSatellites.filter(sat => {
+      const matchesSearch = sat.name.toLowerCase().includes(query);
+      const matchesFilter = filter === 'all' ? true : sat.type === filter;
+      return matchesSearch && matchesFilter;
+    });
+    renderSatellites(filtered);
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+  filterSelect.addEventListener('change', applyFilters);
+
+  fetchSatellites();
+</script>
+{% endblock %}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dashboard{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',
+            secondary: '#1e3a8a',
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="h-screen flex bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 font-sans dark:from-gray-900 dark:to-gray-800 dark:text-gray-200 transition-all duration-500">
+
+  <!-- Overlay for mobile -->
+  <div id="overlay"
+       class="fixed inset-0 bg-black/50 hidden z-20 md:hidden"
+       onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar"
+         class="fixed md:static inset-y-0 left-0 w-64 bg-white/90 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 
+                transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-xl z-30">
+
+    <!-- Logo/Header -->
+    <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-br-3xl shadow-lg">
+      <h2 class="text-2xl font-bold tracking-wide">📊 Dashboard</h2>
+      <button onclick="toggleSidebar()"
+              class="md:hidden text-white text-lg font-bold hover:text-gray-200">✖</button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="px-4 py-6 space-y-2 text-sm font-medium">
+      {% if request.session.role == "admin" %}
+      <a href="{% url 'admin_dashboard' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white shadow-sm {% if request.resolver_match.url_name == 'admin_dashboard' %}bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md{% endif %}">
+        ⚙️ <span>Admin Panel</span>
+      </a>
+      {% elif request.session.role == "analyst" %}
+      <a href="{% url 'analyst_dashboard' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-green-600 hover:text-white shadow-sm {% if request.resolver_match.url_name == 'analyst_dashboard' %}bg-gradient-to-r from-emerald-600 to-green-700 text-white shadow-md{% endif %}">
+        📈 <span>Analyst Panel</span>
+      </a>
+      {% endif %}
+
+      <a href="{% url 'dataset_list' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white shadow-sm {% if request.resolver_match.url_name == 'dataset_list' %}bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md{% endif %}">
+        📂 <span>Datasets</span>
+      </a>
+
+      <a href="{% url 'satellite_dashboard' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-sky-500 hover:to-blue-600 hover:text-white shadow-sm {% if request.resolver_match.url_name == 'satellite_dashboard' %}bg-gradient-to-r from-sky-600 to-blue-700 text-white shadow-md{% endif %}">
+        🛰️ <span>Satellites</span>
+      </a>
+         <a href="{% url 'feedback' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white shadow-sm {% if request.resolver_match.url_name == 'feedback' %}bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md{% endif %}">
+         📬 <span>Feedback</span>
+      </a>
+      <hr class="my-4 border-gray-300 dark:border-gray-700" />
+
+      <a href="{% url 'logout' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-300 shadow-md">
+        🚪 <span>Logout</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Area -->
+  <div class="flex-1 flex flex-col">
+    
+    <!-- Top Navbar -->
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg px-6 py-4 flex items-center justify-between">
+      <button onclick="toggleSidebar()" class="md:hidden text-2xl">☰</button>
+      <h1 class="text-xl md:text-2xl font-bold tracking-wide">
+        {% block header %}Welcome{% endblock %}
+      </h1>
+      <div class="text-sm bg-white/20 px-3 py-1 rounded-lg">
+        👤 <span class="font-semibold">{{ request.session.username }}</span> ({{ request.session.role }})
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 transition-all duration-500">
+      {% block content %}
+      {% endblock %}
+    </main>
+  </div>
+
+  <!-- Sidebar Toggle -->
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>

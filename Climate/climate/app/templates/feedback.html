@@ -1,0 +1,118 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Satellite Data{% endblock %}
+{% block header %}Satellite Datasets{% endblock %}
+
+{% block content %}
+<body class="bg-gray-100 flex min-h-screen">
+
+
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Topbar -->
+   
+
+    <!-- Page Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+
+      <!-- Feedback Form (Only for Analyst) -->
+      {% if request.session.role == "analyst" %}
+      <div class="bg-white shadow-md rounded-xl p-6 mb-6 border-t-4 border-blue-500">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Add Feedback</h2>
+        <form id="feedbackForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+            <input type="text" id="username" placeholder="Enter your name" required
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Feedback</label>
+            <textarea id="feedback" rows="3" placeholder="Write your feedback..."
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+          </div>
+
+          <button type="submit"
+            class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
+            💾 Submit Feedback
+          </button>
+        </form>
+      </div>
+      {% endif %}
+
+      <!-- Feedback List -->
+      <div class="bg-white shadow-md rounded-xl p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">All Feedback</h2>
+        <div id="feedbackList" class="space-y-4">
+          <!-- Feedbacks will appear here -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const feedbackList = document.getElementById("feedbackList");
+    const form = document.getElementById("feedbackForm");
+
+    let feedbacks = [
+      {
+        username: "Ali Raza",
+        text: "Dashboard visualization looks great, but can we add filters by city?",
+        reply: "Good idea! We will include it in next update."
+      },
+      {
+        username: "Sara Khan",
+        text: "Add dark mode option for night use.",
+        reply: ""
+      }
+    ];
+
+    function renderFeedbacks() {
+      feedbackList.innerHTML = feedbacks.map((fb, index) => `
+        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition">
+          <p class="text-gray-800 font-semibold">${fb.username}</p>
+          <p class="text-gray-600 mt-1">${fb.text}</p>
+
+          ${fb.reply
+            ? `<div class="mt-3 bg-green-50 border-l-4 border-green-400 p-3 rounded">
+                 <p class="text-green-700"><strong>Admin Reply:</strong> ${fb.reply}</p>
+               </div>`
+            : `{% if request.session.role == "admin" %}
+               <form onsubmit="addReply(event, ${index})" class="mt-3 flex gap-2">
+                 <input id="reply-${index}" type="text" placeholder="Write a reply..."
+                   class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none">
+                 <button class="bg-green-600 text-white px-4 rounded-lg hover:bg-green-700">Reply</button>
+               </form>
+               {% endif %}`
+          }
+        </div>
+      `).join('');
+    }
+
+    if (form) {
+      form.addEventListener("submit", e => {
+        e.preventDefault();
+        const username = document.getElementById("username").value;
+        const feedback = document.getElementById("feedback").value;
+        if (!username || !feedback) return alert("Please fill all fields!");
+        feedbacks.push({ username, text: feedback, reply: "" });
+        form.reset();
+        renderFeedbacks();
+      });
+    }
+
+    function addReply(e, index) {
+      e.preventDefault();
+      const replyInput = document.getElementById(`reply-${index}`);
+      if (!replyInput.value.trim()) return;
+      feedbacks[index].reply = replyInput.value.trim();
+      renderFeedbacks();
+    }
+
+    renderFeedbacks();
+  </script>
+</body>
+{% endblock %}
+

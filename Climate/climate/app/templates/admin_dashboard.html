@@ -1,0 +1,125 @@
+{% extends 'dashboard.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block header %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- TOP CARDS -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-sm font-medium uppercase">Total Users</h2>
+      <p class="text-3xl font-bold mt-2">1,245</p>
+      <p class="text-xs mt-1 opacity-80">+15% from last month</p>
+    </div>
+
+    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-sm font-medium uppercase">Datasets Uploaded</h2>
+      <p class="text-3xl font-bold mt-2">324</p>
+      <p class="text-xs mt-1 opacity-80">+12% this week</p>
+    </div>
+
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-sm font-medium uppercase">Active Analysts</h2>
+      <p class="text-3xl font-bold mt-2">42</p>
+      <p class="text-xs mt-1 opacity-80">Stable</p>
+    </div>
+
+    <div class="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-sm font-medium uppercase">System Alerts</h2>
+      <p class="text-3xl font-bold mt-2">5</p>
+      <p class="text-xs mt-1 opacity-80">-2 since yesterday</p>
+    </div>
+  </div>
+
+  <!-- CHARTS SECTION -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Line Chart -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-4">User Growth (Last 6 Months)</h3>
+      <canvas id="userGrowthChart" height="120"></canvas>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-4">Dataset Source Distribution</h3>
+      <canvas id="datasetSourceChart" height="120"></canvas>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="bg-white p-6 rounded-lg shadow mt-8">
+    <h3 class="text-lg font-semibold mb-4">Recent Datasets</h3>
+    <table class="min-w-full border border-gray-200 rounded-lg">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-6 py-3 border-b text-left">Name</th>
+          <th class="px-6 py-3 border-b text-left">Source</th>
+          <th class="px-6 py-3 border-b text-left">Format</th>
+          <th class="px-6 py-3 border-b text-left">Uploaded</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-3 border-b">Global Weather Data</td>
+          <td class="px-6 py-3 border-b">Satellite</td>
+          <td class="px-6 py-3 border-b">CSV</td>
+          <td class="px-6 py-3 border-b">2 days ago</td>
+        </tr>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-3 border-b">Air Quality Index</td>
+          <td class="px-6 py-3 border-b">Sensor</td>
+          <td class="px-6 py-3 border-b">JSON</td>
+          <td class="px-6 py-3 border-b">1 week ago</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CHART.JS SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // User Growth Line Chart
+  const ctx1 = document.getElementById('userGrowthChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+      datasets: [{
+        label: 'Users',
+        data: [300, 400, 600, 800, 1200, 1245],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false }},
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f3f4f6' }},
+        x: { grid: { display: false }}
+      }
+    }
+  });
+
+  // Dataset Source Pie Chart
+  const ctx2 = document.getElementById('datasetSourceChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: ['Satellite', 'Sensor', 'Weather Station', 'Historical'],
+      datasets: [{
+        data: [45, 25, 20, 10],
+        backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f43f5e']
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+</script>
+{% endblock %}
